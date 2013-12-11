@@ -3,27 +3,31 @@ namespace  Dota;
 Class Bot {		
 	public function __construct() {	
 		require 'config.php';
-		$this->redis = new \Predis\Client;
+		$this->cache = new \Predis\Client;
 	}
 
-	public function update()
-	{
+	public function update() {
 		// $uh = $this->login();
-		$events = $this->events();
+		 $events = $this->events();		
 	}
 
-	public function login()
-	{
+	public function login() {
 		$response = $this->reddit_api('login', $this->User);
 		return $response['modhash'];
 	}
 
-	public function events()
-	{
-		$events[] = $this->joinDOTA();
-		$events[] = $this->gosugamers();
+	public function events() {
+		if (is_null($this->cache->get('events'))) 
+		{
+			$events['jd'] = $this->joinDOTA();
+			$events['gg'] = $this->gosugamers();
 
-		var_dump($events);
+			$events = json_encode($events);
+
+			$this->cache->set('events', $events);
+		} else $events = $this->cache->get('events');
+
+		var_dump(json_decode($events));
 	}
 
 	protected function joinDOTA() {
@@ -38,8 +42,7 @@ Class Bot {
 		return $data;
 	}
 
-	private function reddit_api($controller,  $parameters, $method = 'POST')
-	{
+	private function reddit_api($controller,  $parameters, $method = 'POST') {
 		$parameters['api_type'] = 'json';
 		$endpoint = 'http://api.reddit.com/api/'.$controller;
 
