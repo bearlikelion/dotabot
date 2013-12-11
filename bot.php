@@ -1,14 +1,16 @@
 <?php
 namespace  Dota;
-Class Bot {		
-	public function __construct() {	
+Class Bot {
+	public function __construct() {
 		require 'config.php';
+
+		$this->limit = 6;
 		$this->cache = new \Predis\Client;
 	}
 
 	public function update() {
 		// $uh = $this->login();
-		 $events = $this->events();		
+		 $events = $this->events();
 	}
 
 	public function login() {
@@ -17,8 +19,7 @@ Class Bot {
 	}
 
 	public function events() {
-		if (is_null($this->cache->get('events'))) 
-		{
+		if (is_null($this->cache->get('events')))  {
 			$events['jd'] = $this->joinDOTA();
 			$events['gg'] = $this->gosugamers();
 
@@ -27,7 +28,32 @@ Class Bot {
 			$this->cache->set('events', $events);
 		} else $events = $this->cache->get('events');
 
-		var_dump(json_decode($events));
+		$this->sort(json_decode($events, true));
+	}
+
+	public function sort($events = NULL) {
+		if (!is_null($events))
+		{
+			foreach ($events['gg'] as $key => $value) $events['gg'][$key]['match_time'] = strtotime($value['datetime']);
+
+			// jD's API often returns NULL, maybe i'm being throttled; or they still have that template FATAL ERROR on their end
+			if (!is_null($events['jd'])) {
+				$matches = array_merge($events['jd'], $events['gg']);
+
+				usort($matches, function($key1, $key2) {
+					$value1 = $key1['match_time'];
+					$value2 = $key2['match_time'];
+					return $value1 - $value2;
+				});
+
+
+				$this->parse($matches);
+			}
+		}
+	}
+
+	public function parse($matches) {
+		print(json_encode($matches));
 	}
 
 	protected function joinDOTA() {
@@ -39,7 +65,7 @@ Class Bot {
 	protected function gosugamers() {
 		$data = file_get_contents($this->API['gg']);
 		$data = json_decode($data);
-		return $data;
+		return $data->matches;
 	}
 
 	private function reddit_api($controller,  $parameters, $method = 'POST') {
