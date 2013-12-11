@@ -1,0 +1,11 @@
+<?php
+	$this->User = array(
+		'user'=>'Username',
+		'passwd'=>'password'
+	);
+
+	$this->API = array(
+		'gg'=>'',
+		'jd'=>''
+	);
+?>
