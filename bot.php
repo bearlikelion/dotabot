@@ -96,6 +96,14 @@ Class Bot {
 		print'</pre>';
 	}
 
+	public function format($ticker) {
+		// TO DO: Format ticker array into reddit markdown
+	}
+
+	public function post($text) {
+		// TO DO: Post $text to reddit
+	}
+
 	protected function joinDOTA() {
 		$data = file_get_contents($this->API['jd']);
 		$data = json_decode($data);
