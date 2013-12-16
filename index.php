@@ -5,12 +5,6 @@
 	require 'vendor/autoload.php';
 	require 'bot.php';
 
-	$app = new \Slim\Slim;
-
-	$app->get('/', function() {
-		$Bot = new \Dota\Bot;
-		$Bot->update();
-	});
-
-	$app->run();
+	$Bot = new \Dota\Bot;
+	$Bot->update();
 ?>
