@@ -1,7 +1,5 @@
 <?php
 namespace  Dota;
-use Mremi\UrlShortener\Model\Link;
-use Mremi\UrlShortener\Provider\Google\GoogleProvider;
 
 Class Bot {
 	public function __construct() {
@@ -10,7 +8,6 @@ Class Bot {
 		require 'lib/snoopy.php';
 
 		$this->limit = 6;
-		date_default_timezone_set('UTC');
 		$this->cache = new \Predis\Client;
 		$this->snoopy = new \Snoopy;
 	}
@@ -188,33 +185,6 @@ Class Bot {
 
 		//Return
 		return $short;
-	}
-
-	private function reddit_api($controller,  $parameters, $method = 'POST') {
-		$parameters['api_type'] = 'json';
-		$endpoint = 'https://ssl.reddit.com/api/'.$controller;
-
-		$curl = curl_init();
-		$options = array(
-			CURLOPT_URL => $endpoint,
-			CURLOPT_RETURNTRANSFER => true,
-		);
-
-		if ($method == 'POST')
-		{
-			$options[CURLOPT_POST] = true;
-			$options[CURLOPT_POSTFIELDS] = $parameters;
-		}
-
-		curl_setopt_array($curl, $options);
-		$response = json_decode(curl_exec($curl), true);
-		curl_close($curl);
-
-		if (!isset($response['json']['error']) && isset($response['json']['data'])) return $response['json']['data'];
-		else {
-			var_dump($response);
-			exit;
-		}
 	}
 }
 ?>
