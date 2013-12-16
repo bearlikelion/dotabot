@@ -1,7 +1,8 @@
 <?php
 	$this->User = array(
 		'user'=>'Username',
-		'passwd'=>'password'
+		'passwd'=>'password',
+		'api_type' => 'json'
 	);
 
 	$this->API = array(
