@@ -1,6 +1,6 @@
 {
     "require": {
         "slim/slim": "2.*",
-        "predis/predis": "0.8.*@dev"
+        "predis/predis": "0.8.*@dev",
     }
 }
