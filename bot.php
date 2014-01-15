@@ -3,13 +3,15 @@ namespace  Dota;
 
 Class Bot {
 	public function __construct() {
+		ini_set('user_agent', '/r/dota2 status checker');
+
 		require 'config.php';
 		require 'lib/googl.php';
 		require 'lib/snoopy.php';
 
 		$this->limit = 6;
 		$this->cache = new \Predis\Client;
-		$this->snoopy = new \Snoopy;
+		$this->snoopy = new \Snoopy;		
 	}
 
 	public function update() {
@@ -29,6 +31,17 @@ Class Bot {
 			$this->cache->expire('uh', 300);
 			$this->cache->expire('cookie', 300);
 		}
+	}
+
+	public function status() {
+		$players = json_decode(file_get_contents('http://www.dota2.com/overview/externaldata/'));		
+		// $gc = json_decode(file_get_contents('http://steamstat.us/status.json'));		
+
+		$return = '';
+		if (isset($gc->gc570->status) && $gc->gc570->status != 'good') $return .= "#### **[The Dota 2 Game Coordinator is Down](http://steamstat.us/)** ####\n\n";
+		if (isset($players->rgPlayersTotal) && $players->rgPlayersTotal == 0) $return .= "##### **[The Dota 2 Network is Offline](http://dota2.com/overview/external)** #####\n";
+
+		return $return;
 	}
 
 	public function events() {
@@ -82,10 +95,13 @@ Class Bot {
 				$total_time = time() - $match['match_time'];
 				if ($total_time < 0) $total_time = $match['match_time'] - time();
 				$days       = floor($total_time /86400);
-				$hours      = floor($total_time /3600);
+				$hours      = intval(($total_time /3600) % 24);
 				$minutes    = intval(($total_time/60) % 60);
 				if($days > 0) $time .= $days . 'd ';
-				if ($hours > 0) $time .= $hours.'h ';
+				if ($hours > 0) {
+					if ($hours > 24) $hours = $hours - 24;
+					$time .= $hours.'h ';
+				}
 				if ($minutes > 0) $time .= $minutes.'m';
 
 				if ($match['isLive']) $time = 'live';
@@ -114,20 +130,24 @@ Class Bot {
 	public function format($ticker) {
 		$tock = "";
 		foreach ($ticker as $tick) {
-			$url = $this->shortenUrl($tick['url']['gg']);
-			if ($tick['time'] == 'live') $tock .= '* [**LIVE - ' . $tick['tournament'] . '**]('.$url.' "'.date('M d H:m T', $tick['timestamp']).'")  ';
-			else $tock .= '* ['.$tick['time'].' - ' . $tick['tournament'] . ']('.$url.' "'.date('M d H:m T', $tick['timestamp']).'")  ';
+			if (isset($tick['url']['gg'])) {
+				$url = $this->shortenUrl($tick['url']['gg']);
+				if ($tick['time'] == 'live') $tock .= '* [**LIVE - ' . $tick['tournament'] . '**]('.$url.' "'.date('M d H:m T', $tick['timestamp']).'")  ';
+				else $tock .= '* ['.$tick['time'].' - ' . $tick['tournament'] . ']('.$url.' "'.date('M d H:m T', $tick['timestamp']).'")  ';
 
-			$tock .= "\n".$tick['teams']."\n\n";
+				$tock .= "\n".$tick['teams']."\n\n";
+			} else $tock = '~~x~~';
 		}
 		$this->prepare($tock);
 	}
 
 	public function prepare($text) {
+		$status = $this->status();
+
 		$json = json_decode(file_get_contents('http://www.reddit.com/r/dota2/wiki/sidebar.json'));
 		$description = $json->data->content_md;
 		$description = str_replace("&gt;", ">", $description);
-		$description = str_replace('%%STATUS%%', '', $description);
+		$description = str_replace('%%STATUS%%', $status, $description);
 		$description = str_replace("%%EVENTS%%", $text, $description);
 
 		$this->post($description);
@@ -165,6 +185,7 @@ Class Bot {
 
 		$this->snoopy->submit("http://www.reddit.com/api/site_admin?api_type=json", $parameters);
 		print "\n\n" . date("[Y/M/d - H:i]: <br>") . $this->snoopy->results;
+		print "\n<pre>".$description."</pre>";
 	}
 
 	protected function joinDOTA() {
