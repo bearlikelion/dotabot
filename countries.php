@@ -246,6 +246,7 @@ $countries = array (
 	'ZW' => 'Zimbabwe',
 	'EU' => 'Europe',
 	'XX' => 'Other',
+	'XA' => '',
 	'wo' => 'World',
 	'KR' => 'Korea',
 	'UN' => 'International'

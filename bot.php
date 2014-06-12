@@ -1,5 +1,5 @@
 <?php
-namespace  Dota;
+namespace Dota;
 
 Class Bot {
 	public function __construct() {
@@ -11,7 +11,7 @@ Class Bot {
 
 		$this->limit = 6;
 		$this->cache = new \Predis\Client;
-		$this->snoopy = new \Snoopy;		
+		$this->snoopy = new \Snoopy;
 	}
 
 	public function update() {
@@ -34,9 +34,8 @@ Class Bot {
 	}
 
 	public function status() {
-		$players = json_decode(file_get_contents('http://www.dota2.com/overview/externaldata/'));		
-		// $gc = json_decode(file_get_contents('http://steamstat.us/status.json'));		
-
+		$gc = json_decode(file_get_contents('http://steamstat.us/status.json'));
+		$players = json_decode(file_get_contents('http://www.dota2.com/overview/externaldata/'));
 		$return = '';
 		if (isset($gc->gc570->status) && $gc->gc570->status != 'good') $return .= "#### **[The Dota 2 Game Coordinator is Down](http://steamstat.us/)** ####\n\n";
 		if (isset($players->rgPlayersTotal) && $players->rgPlayersTotal == 0) $return .= "##### **[The Dota 2 Network is Offline](http://dota2.com/overview/external)** #####\n";
@@ -104,7 +103,7 @@ Class Bot {
 				}
 				if ($minutes > 0) $time .= $minutes.'m';
 
-				if ($match['isLive']) $time = 'live';
+				if ($match['isLive'] || $hours <= 0 && $minutes <= 0) $time = 'live';
 
 				$ticker[$i]['time'] = $time;
 
@@ -124,7 +123,27 @@ Class Bot {
 			} else break;
 		}
 
+		if (isset($_GET['die'])) {
+			d($matches);
+			dd($ticker);
+		}
+
 		$this->format($ticker);
+	}
+
+	/**
+	 * Reindexes the Ticker based on the calculated 'time', placing live at the top and then ordering by hour/minute
+	 * @param  array $ticker
+	 * @return array
+	 */
+	public function sortTicker(&$ticker, $cmp_function)
+	{
+		$live = 0;
+		foreach ($ticker as $tick)
+		{
+			// if ($tick['time'] == 'live')
+		}
+		return $ticker;
 	}
 
 	public function format($ticker) {
@@ -149,6 +168,9 @@ Class Bot {
 		$description = str_replace("&gt;", ">", $description);
 		$description = str_replace('%%STATUS%%', $status, $description);
 		$description = str_replace("%%EVENTS%%", $text, $description);
+
+		$compendium = json_decode(file_get_contents('http://pradneshpatil.com/dota2.php'));
+		$description = str_replace('%%COMPENDIUM%%', '$'.number_format($compendium->total), $description);
 
 		$this->post($description);
 	}

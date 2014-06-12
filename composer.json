@@ -1,5 +1,6 @@
 {
-    "require": {
-        "predis/predis": "0.8.*@dev"
-    }
+	"require": {
+		"predis/predis": "0.8.*@dev",
+		"raveren/kint": "v0.9"
+	}
 }
