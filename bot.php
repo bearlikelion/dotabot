@@ -85,25 +85,27 @@ Class Bot {
 
 	public function parse($matches) {
 		$i = 0;
+		$ticker = array();
 		require 'countries.php';
 		foreach ($matches as $match) {
 			if ($i < $this->limit) {
 				// Time
 				$time = "";
-				$ticker[$i]['timestamp'] = $match['match_time'];
-				$total_time = time() - $match['match_time'];
-				if ($total_time < 0) $total_time = $match['match_time'] - time();
-				$days       = floor($total_time /86400);
-				$hours      = intval(($total_time /3600) % 24);
-				$minutes    = intval(($total_time/60) % 60);
-				if($days > 0) $time .= $days . 'd ';
-				if ($hours > 0) {
-					if ($hours > 24) $hours = $hours - 24;
-					$time .= $hours.'h ';
-				}
-				if ($minutes > 0) $time .= $minutes.'m';
-
-				if ($match['isLive'] || $hours <= 0 && $minutes <= 0) $time = 'live';
+				// game hasn't started yet
+				if (time() > $match['match_time']) {
+					$ticker[$i]['timestamp'] = $match['match_time'];
+					$total_time = time() - $match['match_time'];
+					if ($total_time < 0) $total_time = $match['match_time'] - time();
+					$days       = floor($total_time /86400);
+					$hours      = intval(($total_time /3600) % 24);
+					$minutes    = intval(($total_time/60) % 60);
+					if($days > 0) $time .= $days . 'd ';
+					if ($hours > 0) {
+						if ($hours > 24) $hours = $hours - 24;
+						$time .= $hours.'h ';
+					}
+					if ($minutes > 0) $time .= $minutes.'m';
+				} else $time = 'live';
 
 				$ticker[$i]['time'] = $time;
 
