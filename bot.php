@@ -92,7 +92,7 @@ Class Bot {
 				// Time
 				$time = "";
 				// game hasn't started yet
-				if (time() > $match['match_time']) {
+				if (time() < $match['match_time']) {
 					$ticker[$i]['timestamp'] = $match['match_time'];
 					$total_time = time() - $match['match_time'];
 					if ($total_time < 0) $total_time = $match['match_time'] - time();
