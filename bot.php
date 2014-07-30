@@ -92,8 +92,8 @@ Class Bot {
 				// Time
 				$time = "";
 				// game hasn't started yet
+				$ticker[$i]['timestamp'] = $match['match_time'];
 				if (time() < $match['match_time']) {
-					$ticker[$i]['timestamp'] = $match['match_time'];
 					$total_time = time() - $match['match_time'];
 					if ($total_time < 0) $total_time = $match['match_time'] - time();
 					$days       = floor($total_time /86400);
@@ -157,7 +157,16 @@ Class Bot {
 				else $tock .= '* ['.$tick['time'].' - ' . $tick['tournament'] . ']('.$url.' "'.date('M d H:m T', $tick['timestamp']).'")  ';
 
 				$tock .= "\n".$tick['teams']."\n\n";
-			} else $tock = '~~x~~';
+			}
+		}
+
+		if (count($tock) < $this->limit) {
+			$i = 0;
+			$_nulls = $this->limit - count($tock);
+			while ($i < $_nulls) {
+				$tock .= "* ~~x~~\n\n";
+				$i++;
+			}
 		}
 		$this->prepare($tock);
 	}
@@ -182,34 +191,36 @@ Class Bot {
 
 		$this->snoopy->fetch('http://reddit.com/r/dota2/about/edit/.json');
 		$about = json_decode($this->snoopy->results);
-		$data = $about->data;
+		if (isset($about->data)) {
+			$data = $about->data;
 
-		$parameters['sr'] = 't5_2s580';
-		$parameters['title'] = $data->title;
-		$parameters['public_description'] = $data->public_description;
-		$parameters['lang'] = $data->language;
-		$parameters['type'] = $data->subreddit_type;
-		$parameters['link_type'] = $data->content_options;
-		$parameters['wikimode'] = $data->wikimode;
-		$parameters['wiki_edit_karma'] = $data->wiki_edit_karma;
-		$parameters['wiki_edit_age'] = $data->wiki_edit_age;
-		$parameters['allow_top'] = 'on';
-		$parameters['header-title'] = '';
-		$parameters['id'] = '#sr-form';
-		$parameters['r'] = 'dota2';
-		$parameters['renderstyle'] = 'html';
-		$parameters['comment_score_hide_mins'] = $data->comment_score_hide_mins;
-		$parameters['public_traffic'] = 'on';
-		$parameters['spam_comments'] = 'low';
-		$parameters['spam_links'] = 'high';
-		$parameters['spam_selfposts'] = 'high';
-		$parameters['link_type'] = 'any';
-		$parameters['description'] = $description;
-		$parameters['uh'] = $this->cache->get('uh');
+			$parameters['sr'] = 't5_2s580';
+			$parameters['title'] = $data->title;
+			$parameters['public_description'] = $data->public_description;
+			$parameters['lang'] = $data->language;
+			$parameters['type'] = $data->subreddit_type;
+			$parameters['link_type'] = $data->content_options;
+			$parameters['wikimode'] = $data->wikimode;
+			$parameters['wiki_edit_karma'] = $data->wiki_edit_karma;
+			$parameters['wiki_edit_age'] = $data->wiki_edit_age;
+			$parameters['allow_top'] = 'on';
+			$parameters['header-title'] = '';
+			$parameters['id'] = '#sr-form';
+			$parameters['r'] = 'dota2';
+			$parameters['renderstyle'] = 'html';
+			$parameters['comment_score_hide_mins'] = $data->comment_score_hide_mins;
+			$parameters['public_traffic'] = 'on';
+			$parameters['spam_comments'] = 'low';
+			$parameters['spam_links'] = 'high';
+			$parameters['spam_selfposts'] = 'high';
+			$parameters['link_type'] = 'any';
+			$parameters['description'] = $description;
+			$parameters['uh'] = $this->cache->get('uh');
 
-		$this->snoopy->submit("http://www.reddit.com/api/site_admin?api_type=json", $parameters);
-		print "\n\n" . date("[Y/M/d - H:i]: <br>") . $this->snoopy->results;
-		print "\n<pre>".$description."</pre>";
+			$this->snoopy->submit("http://www.reddit.com/api/site_admin?api_type=json", $parameters);
+			print "\n\n" . date("[Y/M/d - H:i]: <br>") . $this->snoopy->results;
+			print "\n<pre>".$description."</pre>";
+		} else print 'Failed to fetch sidebar from reddit';
 	}
 
 	protected function joinDOTA() {
