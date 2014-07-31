@@ -160,9 +160,9 @@ Class Bot {
 			}
 		}
 
-		if (count($tock) < $this->limit) {
+		if (count($ticker) < $this->limit) {
 			$i = 0;
-			$_nulls = $this->limit - count($tock);
+			$_nulls = $this->limit - count($ticker);
 			while ($i < $_nulls) {
 				$tock .= "* ~~x~~\n\n";
 				$i++;
