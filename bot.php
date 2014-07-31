@@ -163,11 +163,21 @@ Class Bot {
 		if (count($ticker) < $this->limit) {
 			$i = 0;
 			$_nulls = $this->limit - count($ticker);
-			while ($i < $_nulls) {
-				$tock .= "* ~~x~~\n\n";
-				$i++;
+			$twitch = json_decode(file_get_contents('https://api.twitch.tv/kraken/streams?limit=6&game=Dota+2'), true);
+			$streams = $twitch['streams'];
+			foreach ($streams as $stream) {
+				if ($i < $_nulls) {
+					$tock .= '* *twitch* ['.$stream['channel']['display_name'] . "\n";
+					$tock .= implode(' ', array_slice(explode(' ', $stream['channel']['status']), 0, 10)).']('.$stream['channel']['url']." \"".$stream['viewers']." viewers\")\n\n";
+					$i++;
+				} else break;
 			}
+			// while ($i < $_nulls) {
+				// $tock .= "* ~~x~~\n\n"; // blank line
+				// $i++;
+			// }
 		}
+
 		$this->prepare($tock);
 	}
 
