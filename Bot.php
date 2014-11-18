@@ -1,8 +1,10 @@
 <?php
 namespace Dota;
 
-Class Bot {
-	public function __construct() {
+class Bot
+{
+	public function __construct()
+	{
 		ini_set('user_agent', '/r/dota2 status checker');
 
 		require 'config.php';
@@ -10,15 +12,17 @@ Class Bot {
 		require 'lib/snoopy.php';
 
 		$this->limit = 6;
-		$this->cache = new \Predis\Client;
-		$this->snoopy = new \Snoopy;
+		$this->cache = new \Predis\Client();
+		$this->snoopy = new \Snoopy();
 	}
 
-	public function update() {
-		$events = $this->events();
+	public function update()
+	{
+		return $this->events();
 	}
 
-	public function login() {
+	public function login()
+	{
 		if ($this->cache->get('uh') && $this->cache->get('cookie')) $this->snoopy->cookies['reddit_session'] = $this->cache->get('cookie');
 		else {
 			$this->snoopy->submit("http://reddit.com/api/login/".$this->User['user'], $this->User);
@@ -33,31 +37,30 @@ Class Bot {
 		}
 	}
 
-	public function status() {
-		$gc = json_decode(file_get_contents('http://steamstat.us/status.json'));
+	public function status()
+	{
+		// $gc = json_decode(file_get_contents('https://steamdb.info/api/SteamRailgun/'));
 		$players = json_decode(file_get_contents('http://www.dota2.com/overview/externaldata/'));
 		$return = '';
-		if (isset($gc->gc570->status) && $gc->gc570->status != 'good') $return .= "#### **[The Dota 2 Game Coordinator is Down](http://steamstat.us/)** ####\n\n";
+		// if (isset($gc->dota2->status) && $gc->dota2->status != 'good') $return .= "#### **[The Dota 2 Game Coordinator is Down](http://steamstat.us/)** ####\n\n";
 		if (isset($players->rgPlayersTotal) && $players->rgPlayersTotal == 0) $return .= "##### **[The Dota 2 Network is Offline](http://dota2.com/overview/external)** #####\n";
 
 		return $return;
 	}
 
-	public function events() {
-		//if (is_null($this->cache->get('events')))  {
-			// $events['jd'] = $this->joinDOTA();
-			$events['gg'] = $this->gosugamers();
+	public function events()
+	{
+		$events['gg'] = $this->gosugamers();
 
-			$events = json_encode($events);
-
-			$this->cache->set('events', $events);
-			$this->cache->expire('events', 60);
-		//} else $events = $this->cache->get('events');
+		$events = json_encode($events);
+		$this->cache->set('events', $events);
+		$this->cache->expire('events', 60);
 
 		$this->sort(json_decode($events, true));
 	}
 
-	public function sort($events = NULL) {
+	public function sort($events = null)
+	{
 		if (!is_null($events)) {
 			foreach ($events['gg'] as $key => $value) $events['gg'][$key]['match_time'] = strtotime($value['datetime']);
 
@@ -65,13 +68,13 @@ Class Bot {
 			if (isset($events['jd']) && !is_null($events['jd']) && $events['jd'] != 'NULL') {
 				$matches = array_merge($events['jd'], $events['gg']);
 
-				usort($matches, function($key1, $key2) {
+				usort($matches, function ($key1, $key2) {
 					$value1 = $key1['match_time'];
 					$value2 = $key2['match_time'];
 					return $value2 - $value1;
 				});
 			} else {
-				usort($events['gg'], function($key1, $key2) {
+				usort($events['gg'], function ($key1, $key2) {
 					$value1 = $key1['match_time'];
 					$value2 = $key2['match_time'];
 					return $value1 - $value2;
@@ -83,7 +86,8 @@ Class Bot {
 		}
 	}
 
-	public function parse($matches) {
+	public function parse($matches)
+	{
 		$i = 0;
 		$ticker = array();
 		require 'countries.php';
@@ -111,11 +115,11 @@ Class Bot {
 
 				// tournament name
 				if (isset($match['coverage_title'])) $ticker[$i]['tournament'] = $match['coverage_title'];
-				else if (isset($match['tournament']['name'])) $ticker[$i]['tournament'] = $match['tournament']['name'];
+				elseif (isset($match['tournament']['name'])) $ticker[$i]['tournament'] = $match['tournament']['name'];
 
 				// Teams
 				if (isset($match['team_1_name']) && isset($match['team_2_name']))  $ticker[$i]['teams'] = $match['team_1_name'].' vs '.$match['team_2_name'];
-				else if (isset($match['firstOpponent']['shortName']) && isset($match['secondOpponent']['shortName']))  $ticker[$i]['teams'] = '[](/'.strtolower($match['firstOpponent']['country']['countryCode']).' "'.$countries[$match['firstOpponent']['country']['countryCode']].'") '.$match['firstOpponent']['shortName'].' vs [](/'.strtolower($match['secondOpponent']['country']['countryCode']).' "'.$countries[$match['secondOpponent']['country']['countryCode']].'") '.$match['secondOpponent']['shortName'];
+				elseif (isset($match['firstOpponent']['shortName']) && isset($match['secondOpponent']['shortName']))  $ticker[$i]['teams'] = '[](/'.strtolower($match['firstOpponent']['country']['countryCode']).' "'.$countries[$match['firstOpponent']['country']['countryCode']].'") '.$match['firstOpponent']['shortName'].' vs [](/'.strtolower($match['secondOpponent']['country']['countryCode']).' "'.$countries[$match['secondOpponent']['country']['countryCode']].'") '.$match['secondOpponent']['shortName'];
 
 				// URLs
 				if (isset($match['pageUrl'])) $ticker[$i]['url']['gg'] = $match['pageUrl'];
@@ -141,14 +145,14 @@ Class Bot {
 	public function sortTicker(&$ticker, $cmp_function)
 	{
 		$live = 0;
-		foreach ($ticker as $tick)
-		{
+		foreach ($ticker as $tick) {
 			// if ($tick['time'] == 'live')
 		}
 		return $ticker;
 	}
 
-	public function format($ticker) {
+	public function format($ticker)
+	{
 		$tock = "";
 		foreach ($ticker as $tick) {
 			if (isset($tick['url']['gg'])) {
@@ -167,21 +171,18 @@ Class Bot {
 			$streams = $twitch['streams'];
 			foreach ($streams as $stream) {
 				if ($i < $_nulls) {
-					$tock .= '* *twitch* ['.$stream['channel']['display_name'] . "\n";
+					$tock .= '* [](/twitch) ['.$stream['channel']['display_name'] . "\n";
 					$tock .= implode(' ', array_slice(explode(' ', $stream['channel']['status']), 0, 10)).']('.$stream['channel']['url']." \"".$stream['viewers']." viewers\")\n\n";
 					$i++;
 				} else break;
 			}
-			// while ($i < $_nulls) {
-				// $tock .= "* ~~x~~\n\n"; // blank line
-				// $i++;
-			// }
 		}
 
 		$this->prepare($tock);
 	}
 
-	public function prepare($text) {
+	public function prepare($text)
+	{
 		$status = $this->status();
 
 		$json = json_decode(file_get_contents('http://www.reddit.com/r/dota2/wiki/sidebar.json'));
@@ -190,13 +191,11 @@ Class Bot {
 		$description = str_replace('%%STATUS%%', $status, $description);
 		$description = str_replace("%%EVENTS%%", $text, $description);
 
-		$compendium = json_decode(file_get_contents('http://pradneshpatil.com/dota2.php'));
-		$description = str_replace('%%COMPENDIUM%%', '$'.number_format($compendium->total), $description);
-
 		$this->post($description);
 	}
 
-	protected function post($description) {
+	protected function post($description)
+	{
 		$this->login();
 
 		$this->snoopy->fetch('http://reddit.com/r/dota2/about/edit/.json');
@@ -233,19 +232,15 @@ Class Bot {
 		} else print 'Failed to fetch sidebar from reddit';
 	}
 
-	protected function joinDOTA() {
-		$data = file_get_contents($this->API['jd']);
-		$data = json_decode($data);
-		return $data;
-	}
-
-	protected function gosugamers() {
+	protected function gosugamers()
+	{
 		$data = file_get_contents($this->API['gg']);
 		$data = json_decode($data);
 		return $data->matches;
 	}
 
-	private function shortenUrl($url) {
+	private function shortenUrl($url)
+	{
 		$googl = new \Googl($this->googleAPI);
 		$short = $googl->shorten($url);
 
@@ -253,4 +248,3 @@ Class Bot {
 		return $short;
 	}
 }
-?>
