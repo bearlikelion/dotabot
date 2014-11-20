@@ -171,8 +171,8 @@ class Bot
 			$streams = $twitch['streams'];
 			foreach ($streams as $stream) {
 				if ($i < $_nulls) {
-					$tock .= '* [](/twitch) ['.$stream['channel']['display_name'] . "\n";
-					$tock .= implode(' ', array_slice(explode(' ', $stream['channel']['status']), 0, 10)).']('.$stream['channel']['url']." \"".$stream['viewers']." viewers\")\n\n";
+					$tock .= '* ['.$stream['channel']['display_name'] . "\n";
+					$tock .= '[](/twitch) '.implode(' ', array_slice(explode(' ', $stream['channel']['status']), 0, 10)).']('.$stream['channel']['url']." \"".$stream['viewers']." viewers\")\n\n";
 					$i++;
 				} else break;
 			}
