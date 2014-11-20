@@ -169,10 +169,11 @@ class Bot
 			$_nulls = $this->limit - count($ticker);
 			$twitch = json_decode(file_get_contents('https://api.twitch.tv/kraken/streams?limit=6&game=Dota+2'), true);
 			$streams = $twitch['streams'];
+
 			foreach ($streams as $stream) {
 				if ($i < $_nulls) {
-					$tock .= '* ['.$stream['channel']['display_name'] . "\n";
-					$tock .= '[](/twitch) '.implode(' ', array_slice(explode(' ', $stream['channel']['status']), 0, 10)).']('.$stream['channel']['url']." \"".$stream['viewers']." viewers\")\n\n";
+					$tock .= '* ['.$stream['channel']['display_name'] . ' ' . implode(' ', array_slice(explode(' ', $stream['channel']['status']), 0, 10));
+					$tock .= ']('.$stream['channel']['url']." \"".$stream['viewers']." viewers\") [](/twitch) " . $stream['viewers']. " viewers\n\n";
 					$i++;
 				} else break;
 			}
