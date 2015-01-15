@@ -23,3 +23,6 @@ Create a cronjob to process the index.php every 10 minutes.
 ```
 	*/10 * * * * php /srv/rdota2.com/index.php
 ```
+
+## Todo
+* Stream Providers (twitch / douyutv)
