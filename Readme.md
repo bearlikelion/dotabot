@@ -17,7 +17,7 @@ This is a simple script written using the [Slim Framework](http://slimframework.
 	cp .env.example .env
 ```
 
-Edit the .env file for your settings
+Edit the .env file for your configuration
 
 Create a cronjob to process the index.php every 10 minutes.
 ```
