@@ -3,26 +3,19 @@
  * @Author: mark
  * @Date:   2015-01-13 12:45:16
  * @Last Modified by:   mark
- * @Last Modified time: 2015-01-13 15:07:06
+ * @Last Modified time: 2015-01-15 13:46:29
  */
 
 require 'vendor/autoload.php';
 
 Dotenv::load(__DIR__); // load .env config file
 
-$app = new \Slim\Slim([
-	'mode' => (getenv('debug') ? 'development' : 'production'),
-	'debug' => getenv('debug'),
-	'cookies.secret_key' => md5(getenv('secret')),
-	'cookies.httponly' => true,
-	'cookies.encrypt' => true,
-]);
+$app = new \Slim\Slim();
 
 $app->setName('rdota2.com');
 
 $app->get('/', function () {
-	(new Bot())->updateSidebar();
-	print 'test';
+	print (new Classes\Bot())->updateSidebar();
 });
 
 $app->get('/m/:id', function($id) use ($app) {
