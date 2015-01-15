@@ -1,4 +1,4 @@
-public/
+backup/
 vendor/
-config.php
 composer.lock
+.env

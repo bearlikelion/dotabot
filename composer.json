@@ -1,6 +1,15 @@
 {
-	"require": {
-		"predis/predis": "0.8.*@dev",
-		"raveren/kint": "v0.9"
-	}
+    "require": {
+        "slim/slim": "~2.5",
+        "raveren/kint": "0.9.*",
+        "vlucas/phpdotenv": "~1.1",
+        "guzzlehttp/guzzle": "*"
+    },
+    "autoload": {
+        "files": [
+            "classes/base.php",
+        	"classes/bot.php",
+        	"classes/reddit.php"
+        ]
+    }
 }
