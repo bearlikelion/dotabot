@@ -14,7 +14,10 @@ This is a simple script written using the [Slim Framework](http://slimframework.
 	# Install Composer
 	git clone https://github.com/bearlikelion/dotabot.git
 	composer install
+	cp .env.example .env
 ```
+
+Edit the .env file for your settings
 
 Create a cronjob to process the index.php every 10 minutes.
 ```
