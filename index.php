@@ -14,6 +14,13 @@ $app = new \Slim\Slim();
 
 $app->setName('rdota2.com');
 
+if (!isset($_SERVER['REQUEST_METHOD']))
+{
+	(new Classes\Bot())->updateSidebar();
+	print "updated\n";
+	exit;
+}
+
 $app->get('/', function () {
 	print (new Classes\Bot())->updateSidebar();
 });

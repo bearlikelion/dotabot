@@ -4,7 +4,7 @@
  * @Author: mark
  * @Date:   2015-01-13 12:45:16
  * @Last Modified by:   mark
- * @Last Modified time: 2015-01-15 13:46:38
+ * @Last Modified time: 2015-01-16 17:03:09
  */
 
 class Bot extends Base
@@ -100,38 +100,33 @@ class Bot extends Base
 
 	private function _timeTill($time)
 	{
-		$_time = '';
-		$total_time = time() - $time;
+		$timeTill = '';
+		$difference = $time-time();
 
-		if ($total_time < 0)
+		$second = 1;
+		$minute = 60*$second;
+		$hour = 60*$minute;
+		$day = 24*$hour;
+
+		$days = floor($difference/$day);
+		$hours = floor(($difference%$day)/$hour);
+		$minutes = floor((($difference%$day)%$hour)/$minute);
+
+		if ($days > 0)
 		{
-			$total_time = $time - time();
-		}
-
-		$days = floor($total_time /86400);
-		$hours = intval(($total_time /3600) % 24);
-		$minutes = intval(($total_time/60) % 60);
-
-		if($days > 0)
-		{
-			$_time .= $days . 'd ';
+			$timeTill .= $days.'d ';
 		}
 
 		if ($hours > 0)
 		{
-			if ($hours > 24)
-			{
-				$hours = $hours - 24;
-			}
-
-			$_time .= $hours.'h ';
+			$timeTill .= $hours.'h ';
 		}
 
 		if ($minutes > 0)
 		{
-			$_time .= $minutes.'m';
+			$timeTill .= $minutes.'m ';
 		}
 
-		return $_time;
+		return $timeTill;
 	}
 }
