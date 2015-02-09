@@ -21,11 +21,13 @@ if (!isset($_SERVER['REQUEST_METHOD']))
 	exit;
 }
 
-$app->get('/', function () {
+$app->get('/', function () 
+{
 	print (new Classes\Bot())->updateSidebar();
 });
 
-$app->get('/m/:id', function($id) use ($app) {
+$app->get('/m/:id', function($id) use ($app) 
+{
 	$cache = new Redis();
 	$cache->connect('127.0.0.1');
 
