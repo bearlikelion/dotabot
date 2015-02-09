@@ -4,7 +4,7 @@
  * @Author: mark
  * @Date:   2015-01-13 12:45:16
  * @Last Modified by:   mark
- * @Last Modified time: 2015-02-09 11:31:12
+ * @Last Modified time: 2015-02-09 11:33:28
  */
 
 class Reddit extends Base
@@ -40,7 +40,7 @@ class Reddit extends Base
 
 		$settings = $settings->json()['data'];
 
-		$settings['type'] = 'private';
+		$settings['type'] = 'public';
 		$settings['link_type'] = 'any';
 		$settings['api_type'] = 'json';
 		$settings['allow_top'] = true;
