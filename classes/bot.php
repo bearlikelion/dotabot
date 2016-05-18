@@ -4,7 +4,7 @@
  * @Author: mark
  * @Date:   2015-01-13 12:45:16
  * @Last Modified by:   mark
- * @Last Modified time: 2015-01-16 17:03:09
+ * @Last Modified time: 2016-05-18 10:40:52
  */
 
 class Bot extends Base
@@ -24,6 +24,9 @@ class Bot extends Base
 			{
 				$sidebar = json_decode(file_get_contents('http://reddit.com/r/dota2/wiki/sidebar.json'))->data->content_md;
 				$sidebar = str_replace('%%EVENTS%%', $matches, $sidebar);
+
+				$compendium = json_decode(file_get_contents('http://api.steampowered.com/IEconDOTA2_570/GetTournamentPrizePool/v1/?leagueid=4664&key='.getenv('STEAM_KEY')));
+				$sidebar = str_replace('%%COMPENDIUM%%', '$'.number_format($compendium->result->prize_pool), $sidebar);
 
 				$settings = $Reddit->getSettings('dota2');
 				$settings['description'] = html_entity_decode($sidebar);

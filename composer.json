@@ -1,7 +1,7 @@
 {
     "require": {
         "slim/slim": "~2.5",
-        "raveren/kint": "0.9.*",
+        "raveren/kint": "^1.0",
         "vlucas/phpdotenv": "~1.1",
         "guzzlehttp/guzzle": "*"
     },
